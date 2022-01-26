@@ -2,4 +2,3 @@ hosts.ini
 library/*
 library
 library/ansible-sshknownhosts
-
