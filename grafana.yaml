@@ -1,0 +1,17 @@
+- hosts: 192.168.1.16
+  become: yes
+
+  tasks:
+    - ping: ~
+
+    - name: add chromium-browser to autostart
+      lineinfile: 
+       path=/etc/xdg/lxsession/LXDE-pi/autostart
+       regexp="^chromium-browser"  
+       line="/usr/bin/chromium-browser --kiosk --ignore-certificate-errors --disable-restore-session-state http://192.168.1.15:30000/d/AdYXpZigk/sensors?orgId=1&kiosk=tv&from=now-2d&to=now&refresh=30s "
+
+#@lxpanel --profile LXDE-pi
+#@pcmanfm --desktop --profile LXDE-pi
+#@xscreensaver -no-splash
+#/usr/bin/chromium-browser --kiosk --ignore-certificate-errors --disable-restore-session-state http://192.168.1.15:30000/d/AdYXpZigk/sensors?orgId=1&kiosk=tv&from=now-2d&to=now&refresh=30s
+

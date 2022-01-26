@@ -1,0 +1,76 @@
+- hosts: raspbian_all
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: set github email
+      git_config:
+        name: user.email
+        scope: global
+        value: mortyone@hotmail.com
+
+    - name: set github user name
+      git_config:
+        name: user.name
+        scope: global
+        value: '{{ ansible_hostname }}'
+
+
+- hosts: raspbian_desktop
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: checkout github.com:mortyone/Pictures
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortyone/Pictures.git version=main accept_hostkey=True dest=/home/pi/Pictures
+
+
+- hosts: 192.168.1.15
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: Create github directory
+      ansible.builtin.file:
+        path: /home/pi/github
+        state: directory
+#        mode: '0755'
+
+    - name: checkout github.com:mortylabs/ansible.git
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortylabs/ansible.git version=main accept_hostkey=True dest=/home/pi/github/ansible
+
+    - name: checkout github.com:mortylabs/MultiRFLinkTCPBridge.git
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortylabs/MultiRFLinkTCPBridge.git version=main accept_hostkey=True dest=/home/pi/github/MultiRFLinkTCPBridge
+
+    - name: checkout github.com:mortyone/Music
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortyone/Music.git version=main accept_hostkey=True dest=/home/pi/Music
+
+    - name: checkout github.com:mortyone/python
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortyone/python.git version=master accept_hostkey=True dest=/home/pi/python
+
+
+
+
+
+- hosts: raspbian_desktop
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: checkout github.com:mortyone/Pictures
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortyone/Pictures.git version=main accept_hostkey=True dest=/home/pi/Pictures
+
+
+
