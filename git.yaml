@@ -1,3 +1,70 @@
+- hosts: room_assistant
+  remote_user: pi
+  become: yes
+  tasks:
+   - name: pull room-assistant systemd files
+     get_url:
+       url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+       dest: /etc/systemd/system
+     with_items:
+       - room-assistant.service
+   - name: enable room-assistant.service
+     ansible.builtin.systemd:
+       name: room-assistant.service
+       state: started
+       enabled: yes
+       daemon_reload: yes
+
+
+- hosts: rflink_clients
+  remote_user: pi
+  become: yes
+  tasks:
+   - name: pull rflink systemd files
+     get_url:
+       url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+       dest: /etc/systemd/system
+     with_items:
+       - rflink.service
+   - name: enable rflink.service
+     ansible.builtin.systemd:
+       name: rflink.service
+       state: started
+       enabled: yes
+       daemon_reload: yes
+
+
+- hosts: k3s_master
+  remote_user: pi
+  become: yes
+  tasks:
+   - name: pull k8smaster systemd files
+     get_url:
+       url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+#       headers: "X-JFrog-Art-Api:{{ vars.artifactory_api_key }}"
+       dest: /etc/systemd/system
+     with_items:
+       - check_syslog.service
+       - multirflink.service
+       - mybot.service
+#       - rtl_433.service
+       - mysoundserver.service
+
+   - name: enable check_syslog.service
+     ansible.builtin.systemd:
+       name: "{{ item }}"
+       state: started
+       enabled: yes
+       daemon_reload: yes
+     with_items:
+       - check_syslog.service
+       - multirflink.service
+       - mybot.service
+       - mysoundserver.service
+
+
+
+
 - hosts: raspbian_all
   remote_user: pi
   become: yes
@@ -59,18 +126,6 @@
       git: repo=git@github.com:mortyone/python.git version=master accept_hostkey=True dest=/home/pi/python
 
 
-
-
-
-- hosts: raspbian_desktop
-  remote_user: pi
-  become: yes
-
-  tasks:
-    - name: checkout github.com:mortyone/Pictures
-      become: yes
-      become_user: pi
-      git: repo=git@github.com:mortyone/Pictures.git version=main accept_hostkey=True dest=/home/pi/Pictures
 
 
 
