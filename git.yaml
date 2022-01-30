@@ -56,6 +56,11 @@
       dest: /home/pi/github/ansible
       version: main
 
+    - role: git
+      repo: mKeRix/ansible-playbooks.git
+      dest: /home/pi/github/ansible/room-assistant
+      version: master
+
 #    - role: git
 #      repo: mortyone/systemd-services
 #      dest: /home/pi/github/ansible/roles/systemd/files

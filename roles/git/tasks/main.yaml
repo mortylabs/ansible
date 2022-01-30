@@ -1,5 +1,5 @@
 - name: checkout github.com:{{ repo }}
   become: yes
   become_user: pi
-  git: repo=git@github.com:{{ repo }}.git version={{ version }} accept_hostkey=True dest={{ dest }}
+  git: repo=git@github.com:{{ repo }}.git version={{ version }} accept_hostkey=True dest={{ dest }} update=yes
 
