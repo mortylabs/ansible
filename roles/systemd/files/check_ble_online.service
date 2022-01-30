@@ -1,0 +1,14 @@
+[Unit]
+Description=Home Assistant BLE tag tracker
+Wants=network-online.target
+After=network-online.target
+ 
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/python/check_ble_online_ha.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

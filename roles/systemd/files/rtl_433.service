@@ -1,0 +1,14 @@
+[Unit]
+Description=run rtl_433 scanner and send the results to a mqtt broker
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/go
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+# mosquitto_sub -h 192.168.1.15 -p 31883 -u mqtt_user -P PASSWORD_HERE -t "home/rtl_433" > /home/pi/logs/rtl_443.txt
