@@ -1,31 +1,31 @@
-#- hosts: raspbian_all
-#  remote_user: pi
-#  become: yes
+- hosts: raspbian_all
+  remote_user: pi
+  become: yes
 #  gather_facts: no
-#  tasks:
-#    - name: set github email
-#      git_config:
-#        name: user.email
-#        scope: global
-#        value: mortyone@hotmail.com
+  tasks:
+    - name: set github email
+      git_config:
+        name: user.email
+        scope: global
+        value: mortyone@hotmail.com
 
-#    - name: set github user name
-#      git_config:
-#        name: user.name
-#        scope: global
-#        value: '{{ ansible_hostname }}'
-
-
+    - name: set github user name
+      git_config:
+        name: user.name
+        scope: global
+        value: "{{ ansible_hostname }}"
 
 
-#- hosts: raspbian_desktop
-#  remote_user: pi
-#  become: yes
-#  roles:
-#    - role: git
-#      repo: mortyone/Pictures
-#      dest: /home/pi/Pictures
-#      version: main
+
+
+- hosts: raspbian_desktop
+  remote_user: pi
+  become: yes
+  roles:
+    - role: git
+      repo: mortyone/Pictures
+      dest: /home/pi/Pictures
+      version: main
 
 
 
@@ -60,11 +60,6 @@
       repo: mKeRix/ansible-playbooks.git
       dest: /home/pi/github/ansible/room-assistant
       version: master
-
-#    - role: git
-#      repo: mortyone/systemd-services
-#      dest: /home/pi/github/ansible/roles/systemd/files
-#      version: master
 
     - role: git
       repo: mortylabs/MultiRFLinkTCPBridge
