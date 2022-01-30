@@ -1,0 +1,33 @@
+- name: sudo apt nfs-kernel-server
+  apt:
+    name: nfs-kernel-server
+    update_cache: yes
+    state: present
+
+- name: Create /home/pi/nfs directory
+  ansible.builtin.file:
+    path: /home/pi/nfs
+    state: directory
+
+- name: change /home/pi/nfs ownership to pi:pi
+  ansible.builtin.file:
+    path: /home/pi/nfs
+    state: directory
+    recurse: yes
+    owner: pi
+    group: pi
+
+- name: search for all dirs and files within nfs. Give each directory give each directory “755” (Read/Write/Execute for Owner, Read/Execute for Group and Other) permissions. Give each file 644” (Read/Write for Owner, Read for Group and Other) permissions 
+  command: "{{ item }}"
+  with_items:
+    - find /home/pi/nfs/ -type d ! -perm 0755 -exec chmod 755 {} \;
+    - find /home/pi/nfs/ -type f ! -perm 0644 -exec chmod 644 {} \;
+
+- name: add nfs mount folder to /etc/exports
+  lineinfile:
+    path: /etc/exports
+    line: '/home/pi/nfs *(rw,all_squash,insecure,async,no_subtree_check,anonuid=1000,anongid=1000)'
+    state: present
+
+- name: re-export the nfs share
+  command: exportfs -rav

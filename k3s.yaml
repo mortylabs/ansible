@@ -1,15 +1,54 @@
 - hosts: k3s_master
   remote_user: pi
   become: yes
+  gather_facts: no
 
   tasks:
-    - name: Activating cgroup support
+
+    - name: add k3s aliases to bashrc
+      lineinfile:
+        path: /home/pi/.bashrc
+        line: '{{ item }}'
+        state: present
+      with_items:
+        - 'alias k="kubectl"'
+        - 'alias ka="kubectl apply -f "'
+        - 'alias kd="kubectl describe"'
+
+
+    - name: add cgroup support in cmdline.txt
       lineinfile:
         path: /boot/cmdline.txt
         regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
         line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
         backrefs: true
-        notify: reboot
+      register: reboot_pi
+
+    - name: reboot to apply settings and wait 30 secs extra after startup
+      reboot:
+        post_reboot_delay: 30
+      when: reboot_pi is changed
+
+    - name: wait for the reboot to complete if there was a change
+      wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 5
+        timeout: 300
+      when: reboot_pi is changed
+
+
+    - name: sudo apt remove nftables
+      apt:
+        name: nftables
+        state: absent
+        purge: yes
+
+    - name: sudo apt install iptables
+      apt:
+        name: iptables
+        update_cache: yes
+        state: present
 
     - name: Flush iptables before changing to iptables-legacy
       iptables:
@@ -20,10 +59,4 @@
       alternatives:
         path: /usr/sbin/iptables-legacy
         name: iptables
-      register: ip4_legacy
-
-    - name: Changing to ip6tables-legacy
-      alternatives:
-        path: /usr/sbin/ip6tables-legacy
-        name: ip6tables
-      register: ip6_legacy
+#      register: ip4_legacy

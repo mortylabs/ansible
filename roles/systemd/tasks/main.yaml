@@ -1,0 +1,23 @@
+#- name: "pull {{ github_url }}"
+#  get_url:
+#    url: "{{ github_url }}"
+#    dest: /etc/systemd/system
+- name: create /etc/systemd/system/{{ item }}
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+
+- name: enable {{ item }}
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+
+#- name: enable {{ systemd_file }}
+#  ansible.builtin.systemd:
+#    name: "{{ systemd_file }}"
+#    state: started
+#    enabled: yes
+#    daemon_reload: yes

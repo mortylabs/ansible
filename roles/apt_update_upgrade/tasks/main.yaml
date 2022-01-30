@@ -1,0 +1,7 @@
+- name: sudo apt update full_upgrade
+  apt:
+    update_cache: yes
+    upgrade: full
+    autoclean: yes
+    autoremove: yes
+    cache_valid_time: 3600

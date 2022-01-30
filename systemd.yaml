@@ -1,0 +1,126 @@
+
+- hosts: k3s_master
+  remote_user: pi
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: pull systemd files
+    include_role:
+      name: systemd
+#    vars:
+#      github_url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+#      systemd_file: "{{ item }}"
+    with_items:
+      - check_syslog.service
+      - multirflink.service
+      - mybot.service
+#      - rtl_433.service
+      - mysoundserver.service
+
+
+
+- hosts: room_assistant
+  remote_user: pi
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: pull systemd files
+    include_role:
+      name: systemd
+    with_items:
+      - room-assistant.service
+
+
+
+- hosts: rflink_clients
+  remote_user: pi
+  become: yes
+  tasks:
+   - name: pull rflink systemd files
+     get_url:
+       url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+       dest: /etc/systemd/system
+     with_items:
+       - rflink.service
+   - name: enable rflink.service
+     ansible.builtin.systemd:
+       name: rflink.service
+       state: started
+       enabled: yes
+       daemon_reload: yes
+
+
+- hosts: k3s_master
+  remote_user: pi
+  become: yes
+  tasks:
+   - name: pull k8smaster systemd files
+     get_url:
+       url: "https://raw.githubusercontent.com/mortyone/systemd-services/master/{{ item }}"
+#       headers: "X-JFrog-Art-Api:{{ vars.artifactory_api_key }}"
+       dest: /etc/systemd/system
+     with_items:
+       - check_syslog.service
+       - multirflink.service
+       - mybot.service
+#       - rtl_433.service
+       - mysoundserver.service
+
+   - name: enable check_syslog.service
+     ansible.builtin.systemd:
+       name: "{{ item }}"
+       state: started
+       enabled: yes
+       daemon_reload: yes
+     with_items:
+       - check_syslog.service
+       - multirflink.service
+       - mybot.service
+       - mysoundserver.service
+
+#   - name: checkout github.com:mortyone/k8sdata_uk
+ #    become: yes
+  #   become_user: pi
+#     git: repo=git@github.com:mortyone/k8sdata_uk.git version=main accept_hostkey=True dest=/home/pi/nfs/k8sdata
+
+#   - name: checkout github.com:mortyone/k8sbak_uk
+#     become: yes
+#     become_user: pi
+#     git: repo=git@github.com:mortyone/k8sbak_uk.git version=main accept_hostkey=True dest=/home/pi/nfs/k8sbak
+
+#   - name: checkout github.com:mortylabs/k8s
+#     become: yes
+#     become_user: pi
+#     git: repo=git@github.com:mortyone/kubernetes.git version=main accept_hostkey=True dest=/home/pi/nfs/k8s
+
+
+
+
+
+- hosts: raspbian_all
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: set github email
+      git_config:
+        name: user.email
+        scope: global
+        value: mortyone@hotmail.com
+
+    - name: set github user name
+      git_config:
+        name: user.name
+        scope: global
+        value: '{{ ansible_hostname }}'
+
+
+- hosts: raspbian_desktop
+  remote_user: pi
+  become: yes
+
+  tasks:
+    - name: checkout github.com:mortyone/Pictures
+      become: yes
+      become_user: pi
+      git: repo=git@github.com:mortyone/Pictures.git version=main accept_hostkey=True dest=/home/pi/Pictures

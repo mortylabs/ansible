@@ -1,0 +1,16 @@
+[Unit]
+Description=my RFLink TCP service
+#Wants=network-online.target
+#After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=rflinkproxy --port /dev/ttyACM0 --listenport 1234
+Restart=always
+RestartSec=5
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
+
