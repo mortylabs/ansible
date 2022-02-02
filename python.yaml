@@ -1,0 +1,41 @@
+- hosts: k3s_master
+  remote_user: pi
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: create logs directory
+      ansible.builtin.file:
+        path: /home/pi/logs
+        state: directory
+
+#    - role: git
+#      repo: mortyone/python
+#      dest: /home/pi/python
+#      version: master
+
+    - name: sudo apt install matplotlib/numpy dependency - libatlas-base-dev
+      apt:
+        name: libatlas-base-dev
+        update_cache: yes
+        state: present
+
+    - name: pip packages
+      pip: name={{ item }}
+      state: latest
+      with_items:
+#MultiRfLink
+      - python-dotenv
+      - telepot
+      - passlib
+#check_syslog
+      - inotify		
+#mybot
+      - paramiko
+#myBaroGraphy
+      - matplotlib
+      - numpy
+      - influxdb
+#speedtest
+      - speedtest-cli
+      sudo: yes
+

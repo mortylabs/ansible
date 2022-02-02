@@ -17,16 +17,16 @@
       - mysoundserver.service
 
 
-- hosts: room_assistant
-  remote_user: pi
-  become: yes
-  gather_facts: no
-  tasks:
-  - name: pull systemd files
-    include_role:
-      name: systemd
-    with_items:
-      - room-assistant.service
+#- hosts: room_assistant
+#  remote_user: pi
+#  become: yes
+#  gather_facts: no
+#  tasks:
+#  - name: pull systemd files
+#    include_role:
+#      name: systemd
+#    with_items:
+#      - room-assistant.service
 
 
 - hosts: rflink_clients
