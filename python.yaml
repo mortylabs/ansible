@@ -18,6 +18,10 @@
         name: libatlas-base-dev
         update_cache: yes
         state: present
+    - apt:
+        name: mplayer
+        update_cache: yes
+        state: present
 
     - name: pip packages
       pip: name={{ item }}
@@ -37,5 +41,9 @@
       - influxdb
 #speedtest
       - speedtest-cli
+#myRTSP
+      - opencv-contrib-python
+      - opencv-python
+      - pip
       sudo: yes
 
