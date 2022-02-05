@@ -60,3 +60,5 @@
         path: /usr/sbin/iptables-legacy
         name: iptables
 #      register: ip4_legacy
+#https://github.com/itwars/k3s-ansible
+

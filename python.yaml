@@ -42,8 +42,15 @@
 #speedtest
       - speedtest-cli
 #myRTSP
-      - opencv-contrib-python
-      - opencv-python
       - pip
+      sudo: yes
+
+
+
+    - name: pip packages opencv
+      pip: 
+        name=opencv-contrib-python
+        version=4.5.4.60
+      state: present
       sudo: yes
 

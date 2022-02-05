@@ -1,0 +1,174 @@
+#- name: Install numpy
+#  command: "pip install numpy  --upgrade"
+
+- name: Install developer and compile tools
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - build-essential
+  - cmake
+  - git
+  - pkg-config
+  - unzip
+
+- name: Install libraries for various image formats
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - libjpeg-dev
+  - libtiff-dev
+  - libjasper-dev
+  - libpng-dev
+  - libtiff5-dev
+
+- name: Install libraries for various video formats
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - libavcodec-dev
+  - libavformat-dev
+  - libswscale-dev
+  - libv4l-dev
+  - libxvidcore-dev 
+  - libx264-dev
+
+- name: Install GTK for OpenCV GUI
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - libfontconfig1-dev 
+  - libcairo2-dev
+  - libgdk-pixbuf2.0-dev 
+  - libpango1.0-dev
+  - libgtk2.0-dev
+  - libgtk-3-dev
+  - libcanberra-gtk*
+
+- name: Install GStreamer
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - libgstreamer1.0-dev 
+  - gstreamer1.0-gtk3
+  - libgstreamer-plugins-base1.0-dev 
+  - gstreamer1.0-gl
+
+- name: Install misc
+  become: true
+  apt: name={{ item }} state=present
+  with_items:
+  - libtbb2 
+  - libtbb-dev 
+  - libdc1394-22-dev
+  - libv4l-dev 
+  - v4l-utils
+  - libprotobuf-dev 
+  - libgoogle-glog-dev 
+  - libgflags-dev
+  - protobuf-compiler
+
+- name: Install packages used for optimization in OpenCV
+  become: true
+  apt: name={{ item }}
+  with_items:
+  - libatlas-base-dev
+  - libopenblas-dev
+  - libblas-dev
+  - liblapack-dev
+  - gfortran
+
+- name: Install packages used for HDF5 datasets and Qt GUIs
+  become: true
+  apt: 
+    name={{ item }}
+  with_items:
+  - libhdf5-dev 
+  - libhdf5-serial-dev 
+  - libhdf5-103
+#  - libqtgui4 
+#  - libqtwebkit4 
+#  - libqt4-test 
+  - python3-pyqt5
+  - libqt5webkit5
+  - python3-dev
+
+
+#- name: increase maximum swap from 2gb to 4gb
+#  lineinfile:
+#    path: /sbin/dphys-swapfile
+#    regexp: '^CONF_MAXSWAP='
+#    line: '%CONF_MAXSWAP=4096'
+#    state: present
+
+
+- name: Stop service dphys-swapfile, if started
+  ansible.builtin.service:
+    name: dphys-swapfile
+    state: stopped
+- name: start service dphys-swapfile
+  ansible.builtin.service:
+    name: dphys-swapfile
+    state: started
+
+
+- name: pip packages
+  pip: 
+    name: "{{ item }}"
+    state: latest
+  become: True
+  with_items:
+  - pip
+  - numpy
+
+- name: Check if temporary directory already exists
+  stat: path={{ download_dir }}
+  register: tmp
+
+- name: Create temporary download directory
+  file: name={{ download_dir }} state=directory
+  when: tmp.stat.exists == false
+
+- name: Download and unzip opencv
+#  unarchive: src=https://github.com/Itseez/opencv/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
+  unarchive: src=https://github.com/opencv/opencv/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
+
+- name: Download and unzip opencv_contrib
+#  unarchive: src=https://github.com/Itseez/opencv_contrib/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
+  unarchive: src=https://github.com/opencv/opencv_contrib/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
+
+- name: Create build directory
+  file: name={{ download_dir }}/opencv-{{ opencv_version }}/build state=directory
+
+- name: Make the opencv build artifacts
+  shell:  cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH={{ download_dir }}/opencv_contrib-{{ opencv_version }}/modules  -D ENABLE_NEON=O> -D WITH_GSTREAMER=ON -D BUILD_TESTS=OFF -D WITH_EIGEN=OFF -D WITH_V4L=ON -D WITH_LIBV4L=ON -D WITH_VTK=OFF -D WITH_QT=OFF -D OPENCV_ENABLE_NONFREE=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D PYTHON3_PACKAGES_PATH=/usr/lib/python/dist-packages -D OPENCV_GENERATE_PKGCONFIG=ON -D BUILD_EXAMPLES=OFF ..
+#cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=ON -D OPENCV_EXTRA_MODULES_PATH={{ download_dir }}/opencv_contrib-{{ opencv_version }}/modules -D BUILD_EXAMPLES=ON ..
+  args:
+    chdir: "{{ download_dir }}/opencv-{{ opencv_version }}/build"
+    executable: /bin/bash
+
+- name: Compile opencv
+  shell: |
+    make -j4
+  args:
+    chdir: "{{ download_dir }}/opencv-{{ opencv_version }}/build"
+    executable: /bin/bash
+
+- name: Get full path of download directory ("~" varies by user)
+  shell: pwd
+  args:
+    chdir: "{{ download_dir }}"
+  register: pwd_result
+
+- name: Install opencv
+  become: true
+  shell: |
+    make install
+    ldconfig
+  args:
+    chdir: "{{ pwd_result.stdout }}/opencv-{{ opencv_version }}/build"
+    executable: /bin/bash
+
+- name: Remove temporary download directory, if it didn't prevously exist
+  file: name={{ download_dir }} state=absent
+  when: tmp.stat.exists == false
+
