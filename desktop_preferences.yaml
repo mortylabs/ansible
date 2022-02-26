@@ -1,0 +1,91 @@
+- hosts: 192.168.1.15
+  become: yes
+
+  tasks:
+    - name: Execute the command in remote shell; stdout goes to the specified file on the remote
+      ansible.builtin.shell: export DISPLAY=:0.0; pcmanfm -w /home/pi/Pictures/MortylabsLogoFinal.jpg --wallpaper-mode=fit
+      environment: 
+        DISPLAY: ":0.0"
+
+    - name: Create directory /home/pi/.config/pcmanfm/LXDE-pi
+      file:
+        path: /home/pi/.config/pcmanfm/LXDE-pi
+        state: directory
+        mode: '0755'
+
+    - name: Creating empty file desktop-items-0.conf
+      file:
+        path: "/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf"
+        state: touch
+
+    - name: set wallpaper mode to fit
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)wallpaper_mode(.*)$' 
+        line="wallpaper_mode=fit"
+
+    - name: set wallpaper_common=1
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)wallpaper_common(.*)$'
+        line="wallpaper_common=1"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)wallpaper=(.*)$'
+        line="wallpaper=/home/pi/Pictures/MortylabsLogoFinal.jpg"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)desktop_bg=(.*)$'
+        line="desktop_bg=#000000"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)desktop_fg=(.*)$'
+        line="desktop_fg=#E8E8E8g"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)desktop_shadow=(.*)$'
+        line="desktop_shadow=#000000"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)desktop_font=(.*)$'
+        line="desktop_font=PibotoLt 12"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)show_wm_menu(.*)$'
+        line="show_wm_menu=0"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)sort=(.*)$'
+        line="sort=mtime;ascending"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)show_documents(.*)$'
+        line="show_documents=0"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)show_trash(.*)$'
+        line="show_trash=0"
+
+    - name: set wallpaper image
+      lineinfile:
+        path=/home/pi/.config/pcmanfm/LXDE-pi/desktop-items-0.conf
+        regexp='^(.*)show_mounts(.*)$'
+        line="show_mounts=0"

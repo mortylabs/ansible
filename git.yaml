@@ -15,6 +15,10 @@
         scope: global
         value: "{{ ansible_hostname }}"
 
+    - name: create github directory
+      ansible.builtin.file:
+        path: /home/pi/github
+        state: directory
 
 
 
@@ -43,11 +47,6 @@
       with_items:
         - alias ap="ansible-playbook "
         - 'alias al="ansible-lint "'
-
-    - name: create github directory
-      ansible.builtin.file:
-        path: /home/pi/github
-        state: directory
 
 
   roles: 
@@ -85,6 +84,11 @@
       repo: mortyone/k8sbak_uk
       dest: /home/pi/nfs/k8sbak
       version: main
+
+    - role: git
+      repo: mortyone/ai_openvino.git
+      dest: /home/pi/github/ai_openvino
+      version: main 
 
     - role: git
       repo: mortyone/k8sdata_uk
