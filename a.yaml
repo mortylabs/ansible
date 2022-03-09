@@ -1,0 +1,29 @@
+- hosts: 192.168.1.18
+  remote_user: pi
+  become: no
+  gather_facts: no
+  tasks:
+    - name: create github directory
+      ansible.builtin.file:
+        path: /home/pi/github
+        state: directory
+        owner: pi
+        group: pi
+      become: no
+
+- hosts: 192.168.1.18
+#  remote_user: pi
+#  become: yes
+#  gather_facts: no
+#  pre_tasks:
+#    - name: create github directory
+#      ansible.builtin.file:
+#        path: /home/pi/github
+#        state: directory
+
+  roles:
+    - role: git
+      repo: mortyone/ai_openvino
+      dest: /home/pi/github/ai_openvino
+      version: main
+

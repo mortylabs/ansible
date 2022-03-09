@@ -17,7 +17,7 @@
   with_items:
   - libjpeg-dev
   - libtiff-dev
-  - libjasper-dev
+#  - libjasper-dev
   - libpng-dev
   - libtiff5-dev
 
@@ -91,6 +91,10 @@
   - python3-pyqt5
   - libqt5webkit5
   - python3-dev
+  - qtbase5-dev 
+  - qtchooser 
+  - qt5-qmake
+  - qtbase5-dev-tools
 
 
 #- name: increase maximum swap from 2gb to 4gb
@@ -101,14 +105,14 @@
 #    state: present
 
 
-- name: Stop service dphys-swapfile, if started
-  ansible.builtin.service:
-    name: dphys-swapfile
-    state: stopped
-- name: start service dphys-swapfile
-  ansible.builtin.service:
-    name: dphys-swapfile
-    state: started
+#- name: Stop service dphys-swapfile, if started
+#  ansible.builtin.service:
+#    name: dphys-swapfile
+#    state: stopped
+#- name: start service dphys-swapfile
+#  ansible.builtin.service:
+#    name: dphys-swapfile
+#    state: started
 
 
 - name: pip packages
@@ -129,19 +133,16 @@
   when: tmp.stat.exists == false
 
 - name: Download and unzip opencv
-#  unarchive: src=https://github.com/Itseez/opencv/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
   unarchive: src=https://github.com/opencv/opencv/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
 
 - name: Download and unzip opencv_contrib
-#  unarchive: src=https://github.com/Itseez/opencv_contrib/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
   unarchive: src=https://github.com/opencv/opencv_contrib/archive/{{ opencv_version }}.zip dest={{ download_dir }} copy=no
 
 - name: Create build directory
   file: name={{ download_dir }}/opencv-{{ opencv_version }}/build state=directory
 
 - name: Make the opencv build artifacts
-  shell:  cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH={{ download_dir }}/opencv_contrib-{{ opencv_version }}/modules  -D ENABLE_NEON=O> -D WITH_GSTREAMER=ON -D BUILD_TESTS=OFF -D WITH_EIGEN=OFF -D WITH_V4L=ON -D WITH_LIBV4L=ON -D WITH_VTK=OFF -D WITH_QT=OFF -D OPENCV_ENABLE_NONFREE=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D PYTHON3_PACKAGES_PATH=/usr/lib/python/dist-packages -D OPENCV_GENERATE_PKGCONFIG=ON -D BUILD_EXAMPLES=OFF ..
-#cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=ON -D OPENCV_EXTRA_MODULES_PATH={{ download_dir }}/opencv_contrib-{{ opencv_version }}/modules -D BUILD_EXAMPLES=ON ..
+  shell:  cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D OPENCV_EXTRA_MODULES_PATH={{ download_dir }}/opencv_contrib-{{ opencv_version }}/modules  -D ENABLE_NEON=O> -D WITH_GSTREAMER=ON -D BUILD_TESTS=OFF -D WITH_EIGEN=OFF -D WITH_V4L=ON -D WITH_LIBV4L=ON -D WITH_VTK=OFF -D WITH_QT=ON -D OPENCV_ENABLE_NONFREE=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D PYTHON3_PACKAGES_PATH=/usr/lib/python/dist-packages -D OPENCV_GENERATE_PKGCONFIG=ON -D BUILD_EXAMPLES=OFF ..
   args:
     chdir: "{{ download_dir }}/opencv-{{ opencv_version }}/build"
     executable: /bin/bash
@@ -168,7 +169,23 @@
     chdir: "{{ pwd_result.stdout }}/opencv-{{ opencv_version }}/build"
     executable: /bin/bash
 
-- name: Remove temporary download directory, if it didn't prevously exist
-  file: name={{ download_dir }} state=absent
-  when: tmp.stat.exists == false
+
+- name: Install opencv
+#  become: true
+  shell: |
+    make clean
+  args:
+    chdir: "{{ pwd_result.stdout }}/opencv-{{ opencv_version }}/build"
+    executable: /bin/bash
+
+- name: Install opencv
+  become: true
+  shell: |
+    sudo apt get update
+
+
+
+#- name: Remove temporary download directory, if it didn't prevously exist
+#  file: name={{ download_dir }} state=absent
+#  when: tmp.stat.exists == false
 
