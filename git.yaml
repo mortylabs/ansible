@@ -82,11 +82,6 @@
       version: master
 
     - role: git
-      repo: mortylabs/MultiRFLinkTCPBridge
-      dest: /home/pi/github/MultiRFLinkTCPBridge
-      version: main
-
-    - role: git
       repo: mortyone/Music
       dest: /home/pi/Music
       version: main
@@ -99,6 +94,11 @@
     - role: git
       repo: mortyone/kubernetes
       dest: /home/pi/nfs/k8s
+      version: main
+
+    - role: git
+      repo: mortylabs/MultiRFLinkTCPBridge
+      dest: /home/pi/github/MultiRFLinkTCPBridge
       version: main
 
     - role: git
