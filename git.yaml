@@ -26,8 +26,8 @@
     - name: set github hostname as previous doesn't always work
       ansible.builtin.shell: git config --global user.name "{{ ansible_hostname }}"
 
-    - name: set github default merge strategy
-      ansible.builtin.shell: git config pull.rebase false
+#    - name: set github default merge strategy
+#      ansible.builtin.shell: git config pull.rebase false
 
 
 
