@@ -38,6 +38,18 @@
       version: main
 
 
+- hosts: 192.168.1.18
+  remote_user: pi
+  become: yes
+  gather_facts: no
+  roles:
+    - role: git
+      repo: mortyone/ai_openvino
+      dest: /home/pi/github/ai_openvino
+      version: main
+
+
+
 
 - hosts: k3s_master
   remote_user: pi
@@ -62,7 +74,7 @@
       version: main
 
     - role: git
-      repo: mKeRix/ansible-playbooks.git
+      repo: mKeRix/ansible-playbooks
       dest: /home/pi/github/ansible/room-assistant
       version: master
 
@@ -90,11 +102,6 @@
       repo: mortyone/k8sbak_uk
       dest: /home/pi/nfs/k8sbak
       version: main
-
-    - role: git
-      repo: mortyone/ai_openvino.git
-      dest: /home/pi/github/ai_openvino
-      version: main 
 
     - role: git
       repo: mortyone/k8sdata_uk
