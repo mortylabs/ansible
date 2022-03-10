@@ -2,16 +2,11 @@
   remote_user: pi
   become: yes
   gather_facts: no
-  tasks:
+  pre_tasks:
     - name: create logs directory
       ansible.builtin.file:
         path: /home/pi/logs
         state: directory
-
-#    - role: git
-#      repo: mortyone/python
-#      dest: /home/pi/python
-#      version: master
 
     - name: sudo apt install matplotlib/numpy dependency - libatlas-base-dev
       apt:
@@ -24,8 +19,9 @@
         state: present
 
     - name: pip packages
-      pip: name={{ item }}
-      state: latest
+      pip: 
+        name: "{{ item }}"
+        state: latest
       with_items:
 #MultiRfLink
       - python-dotenv
@@ -43,14 +39,21 @@
       - speedtest-cli
 #myRTSP
       - pip
-      sudo: yes
+#      sudo: yes
+      become: True
+
+  roles:
+    - role: git
+      repo: mortyone/python
+      dest: /home/pi/python
+      version: master
 
 
 
-    - name: pip packages opencv
-      pip: 
-        name=opencv-contrib-python
-        version=4.5.4.60
-      state: present
-      sudo: yes
+#    - name: pip packages opencv
+#      pip: 
+#        name=opencv-contrib-python
+#        version=4.5.4.60
+#      state: present
+#      sudo: yes
 
